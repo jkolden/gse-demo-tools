@@ -2,6 +2,9 @@ create or replace package body "S1_HTTP_REQUESTS_PKG" is
 
 procedure update_load_summary(p_type in varchar2, p_date IN date, p_ess_id IN number)
     is
+    /*This procedure update a summary table after each use of the demo tools by a solution engineer. We use this information
+    to track usage statistics for users and cloud ERP instances.
+    */
     
     begin
     
@@ -27,6 +30,9 @@ procedure update_load_summary(p_type in varchar2, p_date IN date, p_ess_id IN nu
 procedure write_success_response
 
 is
+/*
+This procedure writes a success JSON object that is returned to the calling AJAX call after an API call returns a 200
+*/
 
  begin
     apex_json.initialize_clob_output;
@@ -41,6 +47,9 @@ is
  procedure write_error_response(p_status_code IN number, p_description IN varchar2)
 
 is
+/*
+This procedure writes an error message JSON object that is returned to the calling AJAX call after an API call returns <> 200
+*/
 l_message     varchar2(240) := 'The files could not be loaded due to an error. The issue has been logged.';
 
  begin
@@ -68,6 +77,12 @@ procedure make_soap_request(
     PRAGMA EXCEPTION_INIT(http_request_failed, -29273);
    
     begin
+    /*
+    This procedure is used by all of the various loaders to fire SOAP HTTP requests and to monitor the status code result.
+
+    The select count(*) code snippet is not used anymore and can be deprecated. We had an issue with some requests firing in a loop and exceeding the apex.oraclecorp service
+    limits but that has been resolved.
+    */
     SELECT count(*) 
           INTO   g_count 
           FROM   apex_webservice_log 
@@ -129,6 +144,8 @@ function load_bank_statements
     return clob
 
 is
+/*This procedure loads bank statements for the various business units via the importBulkData SOAP API */
+
     l_bank_statement_zip    clob;
     l_status_code           number;
     l_soap_response         clob;
@@ -204,6 +221,8 @@ function load_receivables_invoices
     return clob    
     
     is
+    /*This procedure loads receivables invoices via the importBulkData SOAP API */
+
         l_receivables_file_zip  clob;
         l_status_code           number;
         l_soap_response         clob;
@@ -291,6 +310,8 @@ function load_payables_invoices
     return clob
     
     is
+    /*This procedure loads payables invoices for the various business units via the importBulkData SOAP API */
+
         l_payables_zip     clob;
         l_status_code      number;
         l_soap_response    clob;
@@ -463,6 +484,8 @@ function load_external_transactions
     return clob
     
     is
+    /*This procedure loads external transactions via the importBulkData SOAP API */
+
         l_external_txns    blob;
         l_zip              blob;
         l_base64           clob;
